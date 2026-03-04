@@ -39,8 +39,9 @@
 3. **Configure environment variables**
    ```bash
    cp .env.exemple .env
+   rm .env.exemple
    ```
-   Then edit `.env` with your values (see [Configuration](#-configuration) below).
+   Then edit `.env` with your values (see [Configuration](?tab=readme-ov-file#️-configuration) below).
 
 4. **Run the bot**
    ```bash
