@@ -41,7 +41,7 @@
    cp .env.exemple .env
    rm .env.exemple
    ```
-   Then edit `.env` with your values (see [Configuration](/#%EF%B8%8F-configuration) below).
+   Then edit `.env` with your values (see [Configuration](#%EF%B8%8F-configuration) below).
 
 4. **Run the bot**
    ```bash
