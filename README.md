@@ -21,7 +21,7 @@
 ### Prerequisites
 
 - Python **3.10+**
-- A Telegram Bot token (get one from [@BotFather](https://t.me/BotFather))
+- A Telegram Bot token (get one from [@BotFather](//t.me/BotFather))
 
 ### Installation
 
@@ -41,7 +41,7 @@
    cp .env.exemple .env
    rm .env.exemple
    ```
-   Then edit `.env` with your values (see [Configuration](?tab=readme-ov-file#%EF%B8%8F-configuration) below).
+   Then edit `.env` with your values (see [Configuration](#%EF%B8%8F-configuration) below).
 
 4. **Run the bot**
    ```bash
