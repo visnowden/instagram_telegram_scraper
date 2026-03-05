@@ -1,4 +1,4 @@
-# 📸 instagram_telegram_scraper — Instagram Scraper for Telegram
+# 📸 Instagram Scraper for Telegram
 
 > A lightweight Telegram bot that fetches Instagram post metadata on demand — name, username, description, likes, comments, and publication date — delivered straight to your chat.
 
