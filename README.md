@@ -41,7 +41,7 @@
    cp .env.exemple .env
    rm .env.exemple
    ```
-   Then edit `.env` with your values (see [Configuration](?tab=readme-ov-file#️-configuration) below).
+   Then edit `.env` with your values (see [Configuration](?tab=readme-ov-file#%EF%B8%8F-configuration) below).
 
 4. **Run the bot**
    ```bash
