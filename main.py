@@ -29,7 +29,7 @@ async def get_response(post_url: str):
         response = get(post_url)
     except Exception as e:
         with open(f"logs.log", "a", encoding="utf-8") as f:
-            f.write(f"Error: {e} - {post_url}")
+            f.write(f"Error: {e} - {post_url}\n")
             print("An error has occurred. See log for more info.")
         return "instagram_unavailable"
     if DEBUGGING:
@@ -88,17 +88,24 @@ async def md_instagram_links(origin_text: str) -> str:
     count_of_at = text.count("@")
     hashtag: list[str] = []
     at: list[str] = []
+    print(f"{text =}")
     for _ in range(count_of_hashtag):
         start = text.index("#")
-        slash_index = space_index = 0
+
         try:
             slash_index = text.index("\n", start)
-        except: ...
-        try:
-            space_index = text.index(" ", start)
-        except: ...
+            try:
+                space_index = text.index(" ", start)
+                end = slash_index if slash_index < space_index else space_index
+            except:
+                end = slash_index
+        except:
+            try:
+                space_index = text.index(" ", start)
+                end = space_index
+            except:
+                end = 0
 
-        end = slash_index if slash_index < space_index else space_index
         hashtag.append(text[start:end]) if end else hashtag.append(text[start:])
         text = text.replace(hashtag[-1], "", 1)
     for _ in range(count_of_at):
@@ -142,7 +149,11 @@ async def insta_geter(post_url: str):
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if (update.effective_chat.username in AUTHORIZED_USERS) if AUTHORIZED_USERS else True:
+    if (
+        (update.effective_chat.username in AUTHORIZED_USERS)
+        if AUTHORIZED_USERS
+        else True
+    ):
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=f"Hi {update.effective_chat.first_name}!\nHow are you?",
@@ -151,7 +162,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def insta(update: Update, context: ContextTypes.DEFAULT_TYPE):
     start = time() if DEBUGGING else 0
-    if ((update.effective_chat.username in AUTHORIZED_USERS) if AUTHORIZED_USERS else True) and update.message.text:
+    if (
+        (update.effective_chat.username in AUTHORIZED_USERS)
+        if AUTHORIZED_USERS
+        else True
+    ) and update.message.text:
         await context.bot.set_message_reaction(
             chat_id=update.effective_chat.id,
             message_id=update.effective_message.id,
@@ -185,7 +200,7 @@ async def insta(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         message_to_user = "Check the link again, if everything is ok then the post has been removed."
                     case _:
                         message_to_user = "An error has ocurred."
-                message_to_user += f"\nPlease, try again {"later." if last_url and last_url == url_received else "\b\b."}"
+                message_to_user += f"\nPlease, try again{" later." if last_url and last_url == url_received else "."}"
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,
                 text=message_to_user,
