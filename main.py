@@ -90,9 +90,16 @@ async def md_instagram_links(origin_text: str) -> str:
     at: list[str] = []
     for _ in range(count_of_hashtag):
         start = text.index("#")
-        slash_index, space_index = text.index("\n", start), text.index(" ", start)
+        slash_index = space_index = 0
+        try:
+            slash_index = text.index("\n", start)
+        except: ...
+        try:
+            space_index = text.index(" ", start)
+        except: ...
+
         end = slash_index if slash_index < space_index else space_index
-        hashtag.append(text[start:end])
+        hashtag.append(text[start:end]) if end else hashtag.append(text[start:])
         text = text.replace(hashtag[-1], "", 1)
     for _ in range(count_of_at):
         start = text.index("@")
