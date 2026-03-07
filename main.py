@@ -1,5 +1,4 @@
 # pyright: reportOptionalMemberAccess=false
-
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from telegram import Update
 from bs4 import BeautifulSoup
@@ -9,9 +8,7 @@ from html import unescape
 from requests import get
 from time import time
 
-
 load_dotenv()
-
 global DEBUGGING
 AUTHORIZED_USERS: list[str] = [
     x for x in getenv("AUTHORIZED_USERS", "").split(",") if x
@@ -90,7 +87,6 @@ async def md_instagram_links(origin_text: str) -> str:
     at: list[str] = []
     for _ in range(count_of_hashtag):
         start = text.index("#")
-
         try:
             slash_index = text.index("\n", start)
             try:
@@ -104,15 +100,24 @@ async def md_instagram_links(origin_text: str) -> str:
                 end = space_index
             except:
                 end = 0
-
         hashtag.append(text[start:end]) if end else hashtag.append(text[start:])
         text = text.replace(hashtag[-1], "", 1)
     for _ in range(count_of_at):
         start = text.index("@")
-
-        slash_index, space_index = text.index("\n", start), text.index(" ", start)
-        end = slash_index if slash_index < space_index else space_index
-        at.append(text[start:end])
+        try:
+            slash_index = text.index("\n", start)
+            try:
+                space_index = text.index(" ", start)
+                end = slash_index if slash_index < space_index else space_index
+            except:
+                end = slash_index
+        except:
+            try:
+                space_index = text.index(" ", start)
+                end = space_index
+            except:
+                end = 0
+                at.append(text[start:end])
         text = text.replace(at[-1], "", 1)
     for i in range(count_of_hashtag):
         origin_text = origin_text.replace(
@@ -182,13 +187,11 @@ async def insta(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         Name: {datas["name"]}
                         Username: [{datas["username"]}](instagram.com/{datas["username"][1:]})
                         Description: {await md_instagram_links(str(datas["description"]))}
-
                         {datas["likes"]}
                         {datas["comments"]}
                         Publication date: {datas["date"]}
                         {f"{time()-start:.2f}s" if DEBUGGING else ""}"""
                 )
-
             else:
                 match datas["error"]:
                     case "instagram_unavailable":
@@ -210,10 +213,8 @@ async def insta(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
-
     commands = ["start", "insta"]
     [application.add_handler(CommandHandler(c, globals()[c])) for c in commands]
-
     print("Working")
     application.run_polling()
 
