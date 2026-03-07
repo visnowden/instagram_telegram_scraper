@@ -88,7 +88,6 @@ async def md_instagram_links(origin_text: str) -> str:
     count_of_at = text.count("@")
     hashtag: list[str] = []
     at: list[str] = []
-    print(f"{text =}")
     for _ in range(count_of_hashtag):
         start = text.index("#")
 
