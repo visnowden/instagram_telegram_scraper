@@ -53,7 +53,7 @@ async def get_data(datas: dict[str, str | list], soup: BeautifulSoup):
     tag = str(result.get("content"))
     username_start = tag.index("(")
     username_end = tag.index(")")
-    datas["username"] = tag[username_start + 1 : username_end]
+    datas["username"] = tag[username_start + 1: username_end]
     datas["name"] = tag[:username_start]
     result = soup.find("meta", {"name": "description"})
     assert result is not None, f'Tag "meta title" not found'
@@ -66,7 +66,7 @@ async def get_data(datas: dict[str, str | list], soup: BeautifulSoup):
     datas["description"] = tag[description_start:]
     datas["description"] = tag[:description_end]
     datas["description"] = tag[description_start:description_end].strip()
-    datas["date"] = tag[likes_comments_end : description_start - 1]
+    datas["date"] = tag[likes_comments_end: description_start - 1]
     datas["date"] = (
         datas["date"]
         .replace("-", "")
@@ -86,47 +86,57 @@ async def md_instagram_links(origin_text: str) -> str:
     at: list[str] = []
     for _ in range(count_of_hashtag):
         start = text.index("#")
-        try:
-            slash_index = text.index("\n", start)
+        immediate_space:int = 0
+        end=0
+        while 1:
             try:
-                space_index = text.index(" ", start)
-                end = slash_index if slash_index < space_index else space_index
+                slash_index = text.index("\n", start+immediate_space)
+                try:
+                    space_index = text.index(" ", start+immediate_space)
+                    end = slash_index if slash_index < space_index else space_index
+                except:
+                    end = slash_index
             except:
-                end = slash_index
-        except:
-            try:
-                space_index = text.index(" ", start)
-                end = space_index
-            except:
-                end = 0
-        hashtag.append(text[start:end]) if end else hashtag.append(text[start:])
+                try:
+                    space_index = text.index(" ", start+immediate_space)
+                    end = space_index
+                except:
+                    end = 0
+            if text[start+immediate_space+1:end] or not end: break
+            else:immediate_space+=1
+
+        hashtag.append(text[start:end]) if end else hashtag.append(
+            text[start:])
         text = text.replace(hashtag[-1], "", 1)
     for _ in range(count_of_at):
         start = text.index("@")
-        try:
-            slash_index = text.index("\n", start)
+        immediate_space:int = 0
+        end=0
+        while 1:
             try:
-                space_index = text.index(" ", start)
-                end = slash_index if slash_index < space_index else space_index
+                slash_index = text.index("\n", start+immediate_space)
+                try:
+                    space_index = text.index(" ", start+immediate_space)
+                    end = slash_index if slash_index < space_index else space_index
+                except:
+                    end = slash_index
             except:
-                end = slash_index
-        except:
-            try:
-                space_index = text.index(" ", start)
-                end = space_index
-            except:
-                end = 0
-                at.append(text[start:end])
+                try:
+                    space_index = text.index(" ", start+immediate_space)
+                    end = space_index
+                except:
+                    end = 0
+            if text[start+immediate_space+1:end] or not end: break
+            else:immediate_space+=1
+        at.append(text[start:end]) if end else at.append(text[start:])
         text = text.replace(at[-1], "", 1)
     for i in range(count_of_hashtag):
         origin_text = origin_text.replace(
             hashtag[i],
-            f"[{hashtag[i]}](instagram.com/explore/search/keyword/?q=%23{hashtag[i][1:]})",
-        )
+            f"[{hashtag[i].replace(" ", "")}](instagram.com/explore/search/keyword/?q=%23{hashtag[i][1:].replace(" ", "")})", 1)
     for i in range(count_of_at):
         origin_text = origin_text.replace(
-            at[i], f"[{at[i]}](instagram.com/{at[i][1:]})"
-        )
+            at[i], f"[{at[i].replace(" ", "")}](instagram.com/{at[i][1:].replace(" ", "")})", 1)
     return origin_text
 
 
@@ -213,7 +223,8 @@ async def insta(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     commands = ["start", "insta"]
-    [application.add_handler(CommandHandler(c, globals()[c])) for c in commands]
+    [application.add_handler(CommandHandler(c, globals()[c]))
+     for c in commands]
     print("Working")
     application.run_polling()
 
