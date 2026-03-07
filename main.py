@@ -61,9 +61,8 @@ async def get_data(datas: dict[str, str | list], soup: BeautifulSoup):
     description_start = tag.index('"') + 1
     description_end = tag.index('"', description_start)
     likes_comments_end = tag.index("-")
-    datas["likes"], datas["comments"] = tag[:likes_comments_end].split(",")
+    datas["likes"], datas["comments"] = tag[:likes_comments_end].split(", ")
     datas["comments"] = datas["comments"].strip()
-    datas["likes"] = datas["likes"].strip()
     datas["description"] = tag[description_start:]
     datas["description"] = tag[:description_end]
     datas["description"] = tag[description_start:description_end].strip()
