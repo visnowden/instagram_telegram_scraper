@@ -1,4 +1,5 @@
 # pyright: reportOptionalMemberAccess=false
+from re import search
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from telegram import Update
 from bs4 import BeautifulSoup
@@ -10,31 +11,22 @@ from time import time
 
 load_dotenv()
 global DEBUGGING
-AUTHORIZED_USERS: list[str] = [
-    x for x in getenv("AUTHORIZED_USERS", "").split(",") if x
-]
-TELEGRAM_TOKEN: str = getenv("TELEGRAM_TOKEN") or exit(
-    "TELEGRAM_TOKEN not defined in .env"
-)
+AUTHORIZED_USERS: list[str] = [x for x in getenv("AUTHORIZED_USERS", "").split(",") if x]
+TELEGRAM_TOKEN: str = getenv("TELEGRAM_TOKEN") or exit("TELEGRAM_TOKEN not defined in .env")
 DEBUGGING: bool = getenv("DEV").capitalize() == "True"
 system("cls")
 
 
 async def get_response(post_url: str):
     response = ""
-    try:
-        response = get(post_url)
+    try: response = get(post_url)
     except Exception as e:
         with open(f"logs.log", "a", encoding="utf-8") as f:
             f.write(f"Error: {e} - {post_url}\n")
             print("An error has occurred. See log for more info.")
         return "instagram_unavailable"
     if DEBUGGING:
-        print(
-            "Request was successful!"
-            if response.status_code == 200
-            else f"Status code: {response.status_code}"
-        )
+        print( "Request was successful!" if response.status_code == 200 else f"Status code: {response.status_code}" )
     if DEBUGGING:
         with open(f"page_content.html", "w", encoding="utf-8") as f:
             f.write(unescape(response.text))
@@ -51,10 +43,10 @@ async def get_data(datas: dict[str, str | list], soup: BeautifulSoup):
         return "link_broken_or_post_removed"
     assert result is not None, f'Tag "meta title" not found'
     tag = str(result.get("content"))
-    username_start = tag.index("(")
-    username_end = tag.index(")")
-    datas["username"] = tag[username_start + 1: username_end]
-    datas["name"] = tag[:username_start]
+
+    datas["username"] = search(r"(?<=@)\w*", tag).group()
+    datas["name"] = search(r"^[\w\d\s.]*(?=\s\|)", tag).group()
+
     result = soup.find("meta", {"name": "description"})
     assert result is not None, f'Tag "meta title" not found'
     tag = str(result.get("content"))
