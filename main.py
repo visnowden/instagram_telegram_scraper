@@ -1,5 +1,5 @@
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-from regex import escape, findall, search, split, sub
+from regex import findall, escape, search, split, sub
 from dotenv import load_dotenv
 from os import getenv, system
 from bs4 import BeautifulSoup
