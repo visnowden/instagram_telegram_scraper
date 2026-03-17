@@ -112,12 +112,13 @@ instagram_telegram_scraper/
 
 ## 📦 Dependencies
 
-| Package                  | Version   | Purpose                        |
-|--------------------------|-----------|--------------------------------|
-| `python-telegram-bot`    | 22.6      | Telegram Bot API wrapper       |
-| `beautifulsoup4`         | 4.14.3    | HTML parsing / scraping        |
-| `python-dotenv`          | 1.2.2     | Environment variable loading   |
-| `requests`               | 2.32.5    | HTTP requests                  |
+| Package                  | Version      | Purpose                                        |
+|--------------------------|--------------|------------------------------------------------|
+| `python-telegram-bot`    | 22.6         | Telegram Bot API wrapper                       |
+| `httpx`                  | latest       | Async HTTP requests                            |
+| `lxml`                   | latest       | HTML parsing and XPath querying                |
+| `regex`                  | 2026.02.28   | Extended regex with Unicode property support   |
+| `python-dotenv`          | 1.2.2        | Environment variable loading                   |
 
 ---
 
