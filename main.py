@@ -2,10 +2,10 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from regex import findall, escape, search, split, sub
 from dotenv import load_dotenv
 from os import getenv, system
-from bs4 import BeautifulSoup
+from httpx import AsyncClient
 from telegram import Update
 from html import unescape
-from requests import get
+from lxml import etree
 from time import time
 
 load_dotenv()
@@ -16,8 +16,9 @@ DEBUGGING: bool = str(getenv("DEV")).capitalize() == "True"
 system("cls")
 
 async def get_response(post_url: str):
-    response = ""
-    try: response = get(post_url)
+    try:
+        async with AsyncClient() as client:
+            response = await client.get(post_url)
     except Exception as e:
         with open(f"logs.log", "a", encoding="utf-8") as f:
             f.write(f"Error: {e} - {post_url}\n")
@@ -30,22 +31,21 @@ async def get_response(post_url: str):
             print("HTML content was saved!")
     return response
 
-async def get_data(datas: dict[str, str | list], soup: BeautifulSoup):
-    result = soup.find("meta", {"name": "twitter:title"})
-    if not result:
+async def get_data(datas: dict[str, str | list], tree):
+    tag = tree.xpath("//meta[@name=\"twitter:title\"]/@content")[0]
+    print(f"{tag=}")
+    if not tag:
         with open(f"logs.log", "a", encoding="utf-8") as f:
             f.write(f"Error: link_broken_or_post_removed")
             print("An error has occurred. See log for more info.")
         return "link_broken_or_post_removed"
-    assert result is not None, f'Tag "meta title" not found'
-    tag = str(result.get("content"))
+    assert tag is not None, f'Tag "meta title" not found'
 
     datas["username"] = m.group() if (m := search(r"(?<=\(@)[\w.]*(?=\))", tag)) else ""
     datas["name"] = m.group() if (m := search(r"^.*(?=\s\(@)", tag)) else ""
 
-    result = soup.find("meta", {"name": "description"})
-    assert result is not None, f"Tag \"meta title\" not found"
-    tag = str(result.get("content"))
+    tag = tree.xpath("//meta[@name=\"description\"]/@content")[0]
+    assert tag is not None, f"Tag \"meta title\" not found"
 
     datas["description"] = m.group() if (m := search(r"(?<=\")[^\"]*(?=.)", tag)) else ""
     datas["comments"] = m.group() if (m := search(r"(?<=,\s)[\w\s.]*(?=\s-)", tag)) else ""
@@ -69,8 +69,8 @@ async def insta_geter(post_url: str):
     if isinstance(response, str):
         datas["error"] = response
         return datas
-    soup = BeautifulSoup(response.content, "html.parser")
-    data = await get_data(datas, soup)
+    tree = etree.HTML(response.text)
+    data = await get_data(datas, tree)
     if isinstance(data, str):
         datas["error"] = data
         return datas
